@@ -101,11 +101,14 @@ void CAN_CMD_MOTOR_CONTROL(FDCAN_HandleTypeDef *_hfdcan,float TargetAngle,float 
 
 void ReceiveData_Process(ControlData *Data,uint8_t id)
 {
-    Final_Data[id].Angle = (80 / 1048575) * Data->Angle -40;
-    Final_Data[id].Speed = (80 / 1048575) * Data->Speed -40;
-    Final_Data[id].Torque = (80 / 65535) * Data->Torque - 40;
+    Final_Data[id].Angle = 80.0f * Data->Angle / 1048575 -40;
+    Final_Data[id].Speed = 80.0f * Data->Speed / 1048575 -40;
+    Final_Data[id].Torque = 80.0f * Data->Torque / 65535 -40;
     Final_Data[id].Temperature_flag = Data->Temperature_flag;
-    Final_Data[id].Temperature = (220 / 127) * Data->Temperature - 20;
+    Final_Data[id].Temperature = (uint8_t )(220 * Data->Temperature / 127 - 20);
+
+    usart_printf("%f,%f,%f,%d,%d\n",Final_Data[id].Angle,Final_Data[id].Speed,Final_Data[id].Torque,Final_Data[id].Temperature_flag,Final_Data[id].Temperature);
+
 }
 
 void AllMotor_ENABLE(void)

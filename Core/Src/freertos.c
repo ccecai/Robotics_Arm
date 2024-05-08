@@ -218,10 +218,12 @@ void MotorOutput(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-      SetPoint(&AngleLoop[1],angle_to_radian(360),1);
-      PID_PosLocCalc(&AngleLoop[1],Final_Data[1].Angle,1);
+//      SetPoint(&AngleLoop[1],angle_to_radian(360),1);
+//      PID_PosLocCalc(&AngleLoop[1],Final_Data[1].Angle,1);
+//
+      CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,2.0f,0.0f,3.0f,0.0f,Control_ID1);
 
-      CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,AngleLoop[1].Out_put,0.0f,5.0f,1.5f,Control_ID1);
+//      usart_printf("%f,%f,%f,%d,%d\n",FeedBack_Data.Angle,FeedBack_Data.Speed,FeedBack_Data.Torque,FeedBack_Data.Temperature_flag,FeedBack_Data.Temperature);
 
     osDelay(5);
   }

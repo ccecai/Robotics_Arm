@@ -158,7 +158,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
   {
 		if(hfdcan == &hfdcan1)
 		{
-			fdcan1_rx_callback();
+            fdcan1_rx_callback();
 		}
 		if(hfdcan == &hfdcan2)
 		{
@@ -193,7 +193,7 @@ void fdcan1_rx_callback(void)
         {
             if(rxdata.data_8[0] == 0)
             {
-                while(1);
+//                while(1);
             }
             else if(rxdata.data_8[0] == 1)
             {
@@ -205,7 +205,7 @@ void fdcan1_rx_callback(void)
         {
             if(rxdata.data_8[0] == 0)
             {
-                while(1);
+//                while(1);
             }
             else if(rxdata.data_8[0] == 1)
             {
@@ -215,9 +215,10 @@ void fdcan1_rx_callback(void)
 
         else if(RxHeader.Identifier >= Control_ID1_Receive && RxHeader.Identifier <= Control_ID6_Receive)
         {
+
             index = (RxHeader.Identifier - 0x10) & 0x01F;
 
-            FeedBack_Data.Angle = rxdata.data_8[0] | rxdata.data_8[1] << 8 | ((rxdata.data_8[2] << 16) & 0x0F);
+            FeedBack_Data.Angle = rxdata.data_8[0] | rxdata.data_8[1] << 8 | ((rxdata.data_8[2] << 16) & 0x0FFFFF);
             FeedBack_Data.Speed = ((rxdata.data_8[2] >> 4) & 0x0F) | rxdata.data_8[3] << 4 | rxdata.data_8[4] << 12;
             FeedBack_Data.Torque = rxdata.data_8[5] | rxdata.data_8[6] << 8;
             FeedBack_Data.Temperature_flag = rxdata.data_8[7] & 0x01;
