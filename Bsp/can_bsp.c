@@ -1,4 +1,12 @@
 #include "can_bsp.h"
+#include "fdcan.h"
+#include "dm4310_drv.h"
+#include "string.h"
+#include "DeepMotor.h"
+
+FDCAN_RxHeaderTypeDef RxHeader2;
+uint8_t g_Can2RxData[64];
+
 /**
 ************************************************************************
 * @brief:      	can_bsp_init(void)
@@ -127,6 +135,57 @@ uint8_t fdcanx_send_data(FDCAN_HandleTypeDef *hfdcan, uint16_t id, uint8_t *data
 		return 1;//发送
 	return 0;	
 }
+
+uint8_t canx_send_data(FDCAN_HandleTypeDef *hcan, uint16_t id, uint8_t *data, uint32_t len)
+{
+    FDCAN_TxHeaderTypeDef TxHeader;
+
+    TxHeader.Identifier = id;                 // CAN ID
+    TxHeader.IdType =  FDCAN_STANDARD_ID ;
+    TxHeader.TxFrameType = FDCAN_DATA_FRAME;
+    if(len<=8)
+    {
+        TxHeader.DataLength = len<<16;     // 发送长度：8byte
+    }
+    else  if(len==12)
+    {
+        TxHeader.DataLength =FDCAN_DLC_BYTES_12;
+    }
+    else  if(len==16)
+    {
+        TxHeader.DataLength =FDCAN_DLC_BYTES_16;
+
+    }
+    else  if(len==20)
+    {
+        TxHeader.DataLength =FDCAN_DLC_BYTES_20;
+    }
+    else  if(len==24)
+    {
+        TxHeader.DataLength =FDCAN_DLC_BYTES_24;
+    }else  if(len==48)
+    {
+        TxHeader.DataLength =FDCAN_DLC_BYTES_48;
+    }else  if(len==64)
+    {
+        TxHeader.DataLength =FDCAN_DLC_BYTES_64;
+    }
+
+    TxHeader.ErrorStateIndicator =  FDCAN_ESI_ACTIVE;
+    TxHeader.BitRateSwitch = FDCAN_BRS_OFF;//比特率切换关闭，
+    TxHeader.FDFormat =  FDCAN_CLASSIC_CAN;            // CAN2.0
+    TxHeader.TxEventFifoControl =  FDCAN_NO_TX_EVENTS;
+    TxHeader.MessageMarker = 0;//消息标记
+
+    // 发送CAN指令
+    if(HAL_FDCAN_AddMessageToTxFifoQ(hcan, &TxHeader, data) != HAL_OK)
+    {
+        // 发送失败处理
+        Error_Handler();
+    }
+    return 0;
+}
+
 /**
 ************************************************************************
 * @brief:      	fdcanx_receive(FDCAN_HandleTypeDef *hfdcan, uint8_t *buf)
@@ -158,7 +217,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
   {
 		if(hfdcan == &hfdcan1)
 		{
-			fdcan1_rx_callback();
+            fdcan1_rx_callback();
 		}
 		if(hfdcan == &hfdcan2)
 		{
@@ -193,7 +252,7 @@ void fdcan1_rx_callback(void)
         {
             if(rxdata.data_8[0] == 0)
             {
-                while(1);
+//                while(1);
             }
             else if(rxdata.data_8[0] == 1)
             {
@@ -205,7 +264,7 @@ void fdcan1_rx_callback(void)
         {
             if(rxdata.data_8[0] == 0)
             {
-                while(1);
+//                while(1);
             }
             else if(rxdata.data_8[0] == 1)
             {
@@ -215,9 +274,10 @@ void fdcan1_rx_callback(void)
 
         else if(RxHeader.Identifier >= Control_ID1_Receive && RxHeader.Identifier <= Control_ID6_Receive)
         {
+
             index = (RxHeader.Identifier - 0x10) & 0x01F;
 
-            FeedBack_Data.Angle = rxdata.data_8[0] | rxdata.data_8[1] << 8 | ((rxdata.data_8[2] << 16) & 0x0F);
+            FeedBack_Data.Angle = rxdata.data_8[0] | rxdata.data_8[1] << 8 | ((rxdata.data_8[2] << 16) & 0x0FFFFF);
             FeedBack_Data.Speed = ((rxdata.data_8[2] >> 4) & 0x0F) | rxdata.data_8[3] << 4 | rxdata.data_8[4] << 12;
             FeedBack_Data.Torque = rxdata.data_8[5] | rxdata.data_8[6] << 8;
             FeedBack_Data.Temperature_flag = rxdata.data_8[7] & 0x01;
@@ -232,8 +292,18 @@ void fdcan1_rx_callback(void)
 uint8_t rx_data2[8] = {0};
 void fdcan2_rx_callback(void)
 {
-	fdcanx_receive(&hfdcan2, rx_data2);
+
+    /* Retrieve Rx messages from RX FIFO0 */
+    memset(g_Can2RxData, 0, sizeof(g_Can2RxData));
+    HAL_FDCAN_GetRxMessage(&hfdcan2, FDCAN_RX_FIFO0, &RxHeader2, g_Can2RxData);
+    switch(RxHeader2.Identifier)
+    { //电机反馈ID为0
+        case 0:dm4310_fbdata(&motor, g_Can2RxData, RxHeader2.DataLength);break;
+        default:break;
+
+    }
 }
+
 uint8_t rx_data3[8] = {0};
 void fdcan3_rx_callback(void)
 {

@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "printf.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -59,6 +59,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define POWER_OUT2_Pin GPIO_PIN_13
 #define POWER_OUT2_GPIO_Port GPIOC
+#define POWER_OUT1_Pin GPIO_PIN_14
+#define POWER_OUT1_GPIO_Port GPIOC
 #define POWER_OUT5V_Pin GPIO_PIN_15
 #define POWER_OUT5V_GPIO_Port GPIOC
 #define ACC_CS_Pin GPIO_PIN_0

@@ -48,11 +48,11 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(${includes}  Bsp Controler Device/BMI088/inc User Device/WS2812/inc Device/Screen)
+include_directories(${includes}  Bsp Controler Device/BMI088/inc User Device/WS2812/inc Device/Screen Device/DM_Motor Device/DeepMotor Task)
 
 add_definitions(${defines})
 
-file(GLOB_RECURSE SOURCES ${sources} "Bsp/*.*" "Controler/*.*" "Device/*.*" "User/*.*")
+file(GLOB_RECURSE SOURCES ${sources} "Bsp/*.*" "Controler/*.*" "Device/*.*" "User/*.*" "Task/*.*")
 
 set(LINKER_SCRIPT $${CMAKE_SOURCE_DIR}/${linkerScript})
 

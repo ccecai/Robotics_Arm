@@ -1,8 +1,7 @@
 #ifndef __CAN_BSP_H__
 #define __CAN_BSP_H__
+
 #include "main.h"
-#include "fdcan.h"
-#include "DeepMotor.h"
 
 typedef union
 {
@@ -23,5 +22,7 @@ void fdcan1_rx_callback(void);
 void fdcan2_rx_callback(void);
 void fdcan3_rx_callback(void);
 
+typedef FDCAN_HandleTypeDef hcan_t;
+extern uint8_t canx_send_data(FDCAN_HandleTypeDef *hcan, uint16_t id, uint8_t *data, uint32_t len);
 #endif /* __CAN_BSP_H_ */
 
