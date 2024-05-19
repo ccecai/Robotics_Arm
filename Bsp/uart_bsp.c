@@ -2,6 +2,8 @@
 #include "string.h"
 #include "usart.h"
 #include "printf.h"
+#include "DeepMotor.h"
+#include "pid.h"
 
 #define SBUS_HEAD 0X0F
 #define SBUS_END 0X00
@@ -76,13 +78,17 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef * huart)
 
 void RC_process(void)
 {
-//    usart_printf("%d,%d,%d,%d,%d,%d\n",remoter.rc.ch[0],remoter.rc.ch[1],remoter.rc.ch[2],remoter.rc.ch[3],remoter.rc.ch[4],remoter.rc.ch[5]);
+    usart_printf("%d,%d,%d,%d,%d,%d\n",remoter.rc.ch[0],remoter.rc.ch[1],remoter.rc.ch[2],remoter.rc.ch[3],remoter.rc.ch[4],remoter.rc.ch[5]);
 
     if(remoter.rc.ch[2] >= 600)
+    {
         prx += 0.01f;
-    else if(remoter.rc.ch[2] <= -600)
-        prx -= 0.01f;
+    }
 
+    else if(remoter.rc.ch[2] <= -600)
+    {
+        prx -= 0.01f;
+    }
     if(remoter.rc.ch[3] >= 600)
         pry += 0.01f;
     else if(remoter.rc.ch[3] <= -600)

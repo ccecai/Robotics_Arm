@@ -190,7 +190,7 @@ void KF_kinematics(float theta1,float theta2,float theta3)
     py = T03[1][3];
     pz = T03[2][3];
 
-    usart_printf("%f,%f,%f\n",px,py,pz);
+//    usart_printf("%f,%f,%f\n",px,py,pz);
 }
 //这里限制了一些，规定了theta2>theta3
 void IF_kinematics(float x,float y,float z)
@@ -204,7 +204,7 @@ void IF_kinematics(float x,float y,float z)
     theta2 = -(A + B);
     theta3 = A - B;
 
-    usart_printf("%f,%f,%f\n",theta1,theta2,theta3);
+//    usart_printf("%f,%f,%f\n",theta1,theta2,theta3);
 }
 
 float angle_to_radian(float angle)

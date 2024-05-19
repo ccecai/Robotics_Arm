@@ -183,12 +183,15 @@ void StartDebug(void const * argument)
 {
   /* USER CODE BEGIN StartDebug */
     Power_OUT1_ON;
-    Power_OUT2_ON;
+    Power_OUT2_ON;//使能板卡上的
     HAL_UARTEx_ReceiveToIdle_DMA(&huart5, rx_buff, BUFF_SIZE*2);
     can_bsp_init();
 
     joint_motor_init(&motor,1,MIT_MODE);
-    for(int i=0;i<5;i++)
+
+    osDelay(1000);
+
+    for(int i=0;i<6;i++)
     {
         enable_motor_mode(&hfdcan2, motor.para.id, MIT_MODE);//使能电机
         osDelay(20);
@@ -231,11 +234,12 @@ void MotorOutput(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-//      SetPoint(&AngleLoop[1],angle_to_radian(360),1);
+//      SetPoint(&AngleLoop[1],angle_to_radian(-180),1);
 //      PID_PosLocCalc(&AngleLoop[1],Final_Data[1].Angle,1);
-//
-      CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,2.0f,0.0f,3.0f,0.0f,Control_ID1);
 
+//      CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,AngleLoop[1].Out_put,0.0f,3.0f,0.0f,Control_ID1);
+//      osDelay(5);
+//      mit_ctrl(&hfdcan2,motor.para.id,0.0f,0.0f,0.0f,0.0f,0.0f);
 //      usart_printf("%f,%f,%f,%d,%d\n",FeedBack_Data.Angle,FeedBack_Data.Speed,FeedBack_Data.Torque,FeedBack_Data.Temperature_flag,FeedBack_Data.Temperature);
 
     osDelay(5);
@@ -256,10 +260,6 @@ void Arm(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-//      IF_kinematics(0,radius,30);
-
-//      KF_kinematics(angle_to_radian(44.0f),0.0f,0.0f);
-
       Screen_DataProcess();
 
     osDelay(1);

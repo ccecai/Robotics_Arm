@@ -107,7 +107,7 @@ void ReceiveData_Process(ControlData *Data,uint8_t id)
     Final_Data[id].Temperature_flag = Data->Temperature_flag;
     Final_Data[id].Temperature = (uint8_t )(220 * Data->Temperature / 127 - 20);
 
-    usart_printf("%f,%f,%f,%d,%d\n",Final_Data[id].Angle,Final_Data[id].Speed,Final_Data[id].Torque,Final_Data[id].Temperature_flag,Final_Data[id].Temperature);
+//    usart_printf("%f,%f,%f,%d,%d\n",Final_Data[id].Angle,Final_Data[id].Speed,Final_Data[id].Torque,Final_Data[id].Temperature_flag,Final_Data[id].Temperature);
 
 }
 
