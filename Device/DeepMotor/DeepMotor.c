@@ -5,7 +5,9 @@
 
 ControlData FeedBack_Data;
 FinalData Final_Data[7];
+float begin_pos[7] = {0};
 float TargetAngle[7] = {0};
+uint8_t output_mode = 1;
 
 void CAN_CMD_MOTOR_DISABLE(FDCAN_HandleTypeDef *_hfdcan,uint32_t stdid)
 {
@@ -58,10 +60,10 @@ void CAN_CMD_MOTOR_ENABLE(FDCAN_HandleTypeDef *_hfdcan,uint32_t stdid)
 void CAN_CMD_MOTOR_CONTROL(FDCAN_HandleTypeDef *_hfdcan,float TargetAngle,float TargetSpeed,
                            float Kp,float Kd,float TargetTorque,float stdid)
 {
-    TargetAngle = 819.1875f * TargetAngle - 32767.5f;
-    TargetSpeed = 204.7875f * TargetSpeed - 8191.5f;
+    TargetAngle = 65535 * TargetAngle / 80.0f + 65535.0f / 2;
+    TargetSpeed = 16383 * TargetSpeed / 80.0f + 16383.0f / 2;
     Kd = Kd * 5.0f;
-    TargetTorque = 819.1875f * TargetTorque - 32767.5f;
+    TargetTorque = 65535 * TargetTorque / 80.0f + 65535.0f / 2;
 
     FDCAN_TxHeaderTypeDef  TxHeader;
     uint8_t TxData[8];
@@ -125,6 +127,18 @@ void AllMotor_ENABLE(void)
     osDelay(2);
     CAN_CMD_MOTOR_ENABLE(&hfdcan1,Able_ID6);
     osDelay(2);
+
+    CAN_CMD_MOTOR_CONTROL(&hfdcan1,0,0.0f,0.0f,0.0f,0.0f,Control_ID1);
+    osDelay(5);
+    CAN_CMD_MOTOR_CONTROL(&hfdcan1,0,0.0f,0.0f,0.0f,0.0f,Control_ID2);
+    osDelay(5);
+    CAN_CMD_MOTOR_CONTROL(&hfdcan1,0,0.0f,0.0f,0.0f,0.0f,Control_ID3);
+    osDelay(5);
+
+    for (int i = 1; i < 7; ++i)
+    {
+        begin_pos[i] = Final_Data[i].Angle;
+    }
 }
 
 void AllMotor_DISABLE(void)

@@ -2,6 +2,7 @@
 #define __UART_BSP_H__
 
 #include "main.h"
+#include "controller.h"
 
 #define BUFF_SIZE	25
 

@@ -248,31 +248,8 @@ void fdcan1_rx_callback(void)
     HAL_RetVal = HAL_FDCAN_GetRxMessage(&hfdcan1, FDCAN_RX_FIFO0, &RxHeader, rxdata.data_8);
     if(HAL_RetVal == HAL_OK)
     {
-        if(RxHeader.Identifier >= Disable_ID1_Receive && RxHeader.Identifier <= Disable_ID6_Receive)
-        {
-            if(rxdata.data_8[0] == 0)
-            {
-//                while(1);
-            }
-            else if(rxdata.data_8[0] == 1)
-            {
 
-            }
-        }
-
-        else if(RxHeader.Identifier >= Able_ID1_Receive && RxHeader.Identifier <= Able_ID6_Receive)
-        {
-            if(rxdata.data_8[0] == 0)
-            {
-//                while(1);
-            }
-            else if(rxdata.data_8[0] == 1)
-            {
-
-            }
-        }
-
-        else if(RxHeader.Identifier >= Control_ID1_Receive && RxHeader.Identifier <= Control_ID6_Receive)
+        if(RxHeader.Identifier >= Control_ID1_Receive && RxHeader.Identifier <= Control_ID6_Receive)
         {
 
             index = (RxHeader.Identifier - 0x10) & 0x01F;

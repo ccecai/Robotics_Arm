@@ -4,9 +4,11 @@
 #include <stdint-gcc.h>
 #include "pid.h"
 #include "usart.h"
+#include "DeepMotor.h"
 
 PIDTypeDef AngleLoop[7];
 PIDTypeDef SpeedLoop[7];
+PIDTypeDef Torque[7];
 
 void PID_Init(PIDTypeDef *pid)
 {
@@ -30,7 +32,7 @@ void PID_Set_KP_KI_KD(PIDTypeDef *pid,float kp,float ki,float kd)
 //PID位置环目标确定
 void SetPoint(PIDTypeDef *pid,float want,uint8_t id)
 {
-    pid->Setpoint = want ;    //在初始零点的基础上进行位置控制
+    pid->Setpoint = want + begin_pos[id];    //在初始零点的基础上进行位置控制
 }
 void SetPoint_IMU(PIDTypeDef *pid,float want)
 {
@@ -143,5 +145,6 @@ void Six_PID_Init(void )
     {
         PID_Init(&AngleLoop[i]);
         PID_Init(&SpeedLoop[i]);
+        PID_Init(&Torque[i]);
     }
 }

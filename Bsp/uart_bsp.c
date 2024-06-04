@@ -12,7 +12,7 @@
 
 uint8_t rx_buff[BUFF_SIZE];
 remoter_t remoter;
-float prx,pry,prz = 0;
+float prx = 1.0f,pry = 1.0f,prz = 27.0f;
 
 void sbus_frame_parse(remoter_t *remoter, uint8_t *buf)
 {
@@ -78,24 +78,21 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef * huart)
 
 void RC_process(void)
 {
-    usart_printf("%d,%d,%d,%d,%d,%d\n",remoter.rc.ch[0],remoter.rc.ch[1],remoter.rc.ch[2],remoter.rc.ch[3],remoter.rc.ch[4],remoter.rc.ch[5]);
-
     if(remoter.rc.ch[2] >= 600)
-    {
-        prx += 0.01f;
-    }
+        prx += 0.03f;
 
     else if(remoter.rc.ch[2] <= -600)
-    {
-        prx -= 0.01f;
-    }
+        prx -= 0.03f;
+
     if(remoter.rc.ch[3] >= 600)
-        pry += 0.01f;
+        pry += 0.03f;
+
     else if(remoter.rc.ch[3] <= -600)
-        pry -= 0.01f;
+        pry -= 0.03f;
 
     if(remoter.rc.ch[1] >= 600)
-        prz += 0.01f;
+        prz += 0.03f;
+
     else if(remoter.rc.ch[1] <= -600)
-        prz -= 0.01f;
+        prz -= 0.03f;
 }

@@ -3,8 +3,9 @@
 //
 #include "controller.h"
 #include "printf.h"
+#include "DeepMotor.h"
 
-float theta1 = 0,theta2 = 0,theta3 = 0; // 目前所有角度均为弧度制
+double theta1 = 0,theta2 = 0,theta3 = 0; // 目前所有角度均为弧度制
 float px = 0,py = 0,pz = 0;
 /**********
  *
@@ -190,21 +191,20 @@ void KF_kinematics(float theta1,float theta2,float theta3)
     py = T03[1][3];
     pz = T03[2][3];
 
-//    usart_printf("%f,%f,%f\n",px,py,pz);
 }
-//这里限制了一些，规定了theta2>theta3
-void IF_kinematics(float x,float y,float z)
+
+void IF_kinematics(double x,double y,double z)
 {
-    float A = 0,B = 0;
-    theta1 = atan(x/y);
+    if(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) > (2*L1))
+    {
 
-    A = atan( (2 * radius * tan(90 - theta1 - atan(y/x)) / L1) / ((z - radius) / L1) );
-    B = atan(sqrt(4 * pow(cos(A),2) - pow(((z - radius) / L1),2)) / ((z - radius) / L1));
-
-    theta2 = -(A + B);
-    theta3 = A - B;
-
-//    usart_printf("%f,%f,%f\n",theta1,theta2,theta3);
+    }
+    else
+    {
+        theta1 = -atan(y/x);
+        theta2 = -(PI / 2  - atan(z / sqrt(pow(x,2) + pow(y,2))) - acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)));
+        theta3 = acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)) + atan(sqrt(pow(x,2) + pow(y,2)) / z);
+    }
 }
 
 float angle_to_radian(float angle)

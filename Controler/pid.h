@@ -38,6 +38,7 @@ typedef struct
 
 extern PIDTypeDef AngleLoop[7];
 extern PIDTypeDef SpeedLoop[7];
+extern PIDTypeDef Torque[7];
 
 void PID_Init(PIDTypeDef *pid);
 void PID_Set_KP_KI_KD(PIDTypeDef *pid,float kp,float ki,float kd);

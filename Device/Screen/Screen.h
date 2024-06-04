@@ -11,8 +11,12 @@
 #include "Programming_by_Demonstration.h"
 
 extern uint8_t Screen_Data[10];
+extern uint8_t Pro_flag;
 
 #define Screen_Length 10
+#define IF_MODE 1
+#define Demonstration_MODE 2
+#define Gravity_compensation_MODE 3
 
 void Screen_DataProcess(void);
 

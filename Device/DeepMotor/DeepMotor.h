@@ -74,6 +74,8 @@ typedef struct {
 extern ControlData FeedBack_Data;
 extern FinalData Final_Data[7];
 extern float TargetAngle[7];
+extern float begin_pos[7];
+extern uint8_t output_mode;
 
 void CAN_CMD_MOTOR_DISABLE(FDCAN_HandleTypeDef *_hfdcan,uint32_t stdid);
 void CAN_CMD_MOTOR_ENABLE(FDCAN_HandleTypeDef *_hfdcan,uint32_t stdid);

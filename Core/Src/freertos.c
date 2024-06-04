@@ -39,7 +39,7 @@
 #include "printf.h"
 #include "dm4310_drv.h"
 #include "gpio.h"
-
+#include "tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -147,7 +147,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of StartDebugTask */
-  osThreadStaticDef(StartDebugTask, StartDebug, osPriorityNormal, 0, 128, defaultTaskBuffer, &defaultTaskControlBlock);
+  osThreadStaticDef(StartDebugTask, StartDebug, osPriorityLow, 0, 128, defaultTaskBuffer, &defaultTaskControlBlock);
   StartDebugTaskHandle = osThreadCreate(osThread(StartDebugTask), NULL);
 
   /* definition and creation of MotorOutputTask */
@@ -155,11 +155,11 @@ void MX_FREERTOS_Init(void) {
   MotorOutputTaskHandle = osThreadCreate(osThread(MotorOutputTask), NULL);
 
   /* definition and creation of ArmTask */
-  osThreadStaticDef(ArmTask, Arm, osPriorityAboveNormal, 0, 256, myTask05Buffer, &myTask05ControlBlock);
+  osThreadStaticDef(ArmTask, Arm, osPriorityRealtime, 0, 256, myTask05Buffer, &myTask05ControlBlock);
   ArmTaskHandle = osThreadCreate(osThread(ArmTask), NULL);
 
   /* definition and creation of RCTask */
-  osThreadStaticDef(RCTask, RC, osPriorityHigh, 0, 1024, myTask06Buffer, &myTask06ControlBlock);
+  osThreadStaticDef(RCTask, RC, osPriorityBelowNormal, 0, 1024, myTask06Buffer, &myTask06ControlBlock);
   RCTaskHandle = osThreadCreate(osThread(RCTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -186,6 +186,7 @@ void StartDebug(void const * argument)
     Power_OUT2_ON;//使能板卡上的
     HAL_UARTEx_ReceiveToIdle_DMA(&huart5, rx_buff, BUFF_SIZE*2);
     can_bsp_init();
+    HAL_TIM_Base_Start_IT(&htim2);
 
     joint_motor_init(&motor,1,MIT_MODE);
 
@@ -201,11 +202,15 @@ void StartDebug(void const * argument)
 
     AllMotor_ENABLE();
     Six_PID_Init();
-    ChangeGainOfPID(10.0f,0.5f,0.0f,0.0f);
+    ChangeGainOfPID(15.0f,2.0f,0.0f,0.0f);
+    for (int i = 1; i < 4; ++i) {
+        PID_Set_KP_KI_KD(&Torque[i],0.64f,0,0.0f);
+    }
 
-    vTaskResume(MotorOutputTaskHandle);
-    vTaskResume(ArmTaskHandle);
+
     vTaskResume(RCTaskHandle);
+    vTaskResume(ArmTaskHandle);
+    vTaskResume(MotorOutputTaskHandle);
   /* Infinite loop */
   for(;;)
   {
@@ -234,15 +239,79 @@ void MotorOutput(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-//      SetPoint(&AngleLoop[1],angle_to_radian(-180),1);
-//      PID_PosLocCalc(&AngleLoop[1],Final_Data[1].Angle,1);
+      switch (output_mode)
+      {
+          case IF_MODE:
 
-//      CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,AngleLoop[1].Out_put,0.0f,3.0f,0.0f,Control_ID1);
-//      osDelay(5);
-//      mit_ctrl(&hfdcan2,motor.para.id,0.0f,0.0f,0.0f,0.0f,0.0f);
-//      usart_printf("%f,%f,%f,%d,%d\n",FeedBack_Data.Angle,FeedBack_Data.Speed,FeedBack_Data.Torque,FeedBack_Data.Temperature_flag,FeedBack_Data.Temperature);
+              SetPoint(&AngleLoop[1],theta1,1);
+              PID_PosLocCalc(&AngleLoop[1],Final_Data[1].Angle,1);
+              SetPoint(&AngleLoop[2],theta2,2);
+              PID_PosLocCalc(&AngleLoop[2],Final_Data[2].Angle,2);
+              SetPoint(&AngleLoop[3],theta3,3);
+              PID_PosLocCalc(&AngleLoop[3],Final_Data[3].Angle,3);
 
-    osDelay(5);
+              AngleLoop[1].Output_limit = 2.5f;
+              AngleLoop[2].Output_limit = 2.5f;
+              AngleLoop[3].Output_limit = 2.5f;
+
+              CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,AngleLoop[1].Out_put,0.0f,4.2f,0.0f,Control_ID1);
+              osDelay(2);
+              CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,AngleLoop[2].Out_put,0.0f,4.2f,0.0f,Control_ID2);
+              osDelay(2);
+              CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,AngleLoop[3].Out_put,0.0f,4.2f,0.0f,Control_ID3);
+              osDelay(2);
+
+              break;
+
+          case Demonstration_MODE:
+
+              SetPoint(&AngleLoop[1],TargetAngle[1],1);
+              PID_PosLocCalc(&AngleLoop[1],Final_Data[1].Angle,1);
+              SetPoint(&AngleLoop[2],TargetAngle[2],2);
+              PID_PosLocCalc(&AngleLoop[2],Final_Data[2].Angle,2);
+              SetPoint(&AngleLoop[3],TargetAngle[3],3);
+              PID_PosLocCalc(&AngleLoop[3],Final_Data[3].Angle,3);
+
+              AngleLoop[1].Output_limit = 2.0f;
+              AngleLoop[2].Output_limit = 2.0f;
+              AngleLoop[3].Output_limit = 2.0f;
+
+              CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,AngleLoop[1].Out_put,0.0f,speed_kd,0.0f,Control_ID1);
+              osDelay(2);
+              CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,AngleLoop[2].Out_put,0.0f,speed_kd,0.0f,Control_ID2);
+              osDelay(2);
+              CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,AngleLoop[3].Out_put,0.0f,speed_kd,0.0f,Control_ID3);
+              osDelay(2);
+
+              break;
+
+          case Gravity_compensation_MODE:
+
+              SetPoint_IMU(&Torque[1],0);
+              PID_PosLocCalc(&Torque[1],Final_Data[1].Angle,1);
+              SetPoint_IMU(&Torque[2],0);
+              PID_PosLocCalc(&Torque[2],Final_Data[2].Angle,2);
+              SetPoint_IMU(&Torque[3],0);
+              PID_PosLocCalc(&Torque[3],Final_Data[3].Angle,3);
+
+              Torque[1].Output_limit = 2.0f;
+              Torque[2].Output_limit = 2.0f;
+              Torque[3].Output_limit = 2.0f;
+
+              CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,0.0f,0.0f,0.0f,Torque[1].Out_put,Control_ID1);
+              osDelay(2);
+              CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,0.0f,0.0f,0.0f,Torque[2].Out_put,Control_ID2);
+              osDelay(2);
+              CAN_CMD_MOTOR_CONTROL(&hfdcan1,0.0f,0.0f,0.0f,0.0f,Torque[3].Out_put,Control_ID3);
+              osDelay(2);
+
+              break;
+
+          default:
+              break;
+      }
+
+      osDelay(2);
   }
   /* USER CODE END MotorOutput */
 }
@@ -262,7 +331,7 @@ void Arm(void const * argument)
   {
       Screen_DataProcess();
 
-    osDelay(1);
+    osDelay(5);
   }
   /* USER CODE END Arm */
 }
@@ -281,6 +350,8 @@ void RC(void const * argument)
   for(;;)
   {
       RC_process();
+
+//      usart_printf("%f,%f,%f,%f,%f,%f,%f,%f\n",times[0] / 1000,times[1] / 1000,times[2] / 1000,times[3] / 1000,Memory_theta[1][0],Memory_theta[1][1],Memory_theta[1][2],Memory_theta[1][3]);
 
     osDelay(1);
   }

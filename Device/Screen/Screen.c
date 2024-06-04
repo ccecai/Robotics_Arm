@@ -15,19 +15,21 @@ void Screen_DataProcess(void)
     }
     else if(Screen_Data[0] == 0xa0 && Screen_Data[1] == 0x12 && Screen_Data[2] == 0xaf)
     {
-        KF_kinematics(Final_Data[1].Angle,Final_Data[2].Angle,Final_Data[3].Angle);
+        output_mode = Gravity_compensation_MODE;
     }
     else if(Screen_Data[0] == 0xa0 && Screen_Data[1] == 0x13 && Screen_Data[2] == 0xaf)
     {
         IF_kinematics(prx,pry,prz);
+        output_mode = IF_MODE;
     }
     else if(Screen_Data[0] == 0xa0 && Screen_Data[1] == 0x14 && Screen_Data[2] == 0xaf && Pro_flag == 1)
     {
+        output_mode = Gravity_compensation_MODE;
         Demonstration();
     }
     else if(Screen_Data[0] == 0xa0 && Screen_Data[1] == 0x15 && Screen_Data[2] == 0xaf && Pro_flag == 1)
     {
+        output_mode = Demonstration_MODE;
         by_Programming();
-        Pro_flag = 0;
     }
 }
