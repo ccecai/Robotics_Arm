@@ -23,13 +23,14 @@ void Myinit(void )
 {
     Power_OUT1_ON;
     Power_OUT2_ON;//使能板卡上的电源
+
     HAL_UARTEx_ReceiveToIdle_DMA(&huart5, rx_buff, BUFF_SIZE*2);
     can_bsp_init();
     HAL_TIM_Base_Start_IT(&htim2);
 
     joint_motor_init(&motor,1,MIT_MODE);
 
-    osDelay(3000); //等待云深处电机驱动开机
+    osDelay(4000); //等待云深处电机驱动开机
 
     for(int i=0;i<6;i++)
     {
@@ -42,7 +43,8 @@ void Myinit(void )
     AllMotor_ENABLE();
     Six_PID_Init();
     ChangeGainOfPID(15.0f,2.0f,0.0f,0.0f);
-    for (int i = 1; i < 4; ++i) {
+    for (int i = 1; i < 4; ++i)
+    {
         PID_Set_KP_KI_KD(&Torque[i],0.64f,0,0.0f);
     }
 
