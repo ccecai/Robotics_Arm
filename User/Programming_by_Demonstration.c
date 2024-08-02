@@ -55,7 +55,7 @@ void by_Programming(void )
     }
 
     count_t++;
-    osDelay(1200);
+    osDelay(2500);
 }
 float ABS(float a)
 {

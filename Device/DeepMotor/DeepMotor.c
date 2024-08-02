@@ -7,7 +7,7 @@ ControlData FeedBack_Data;
 FinalData Final_Data[7];
 float begin_pos[7] = {0};
 float TargetAngle[7] = {0};
-uint8_t output_mode = 1;
+uint8_t output_mode = 2;
 
 void CAN_CMD_MOTOR_DISABLE(FDCAN_HandleTypeDef *_hfdcan,uint32_t stdid)
 {

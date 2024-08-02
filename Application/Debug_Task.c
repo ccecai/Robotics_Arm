@@ -47,5 +47,10 @@ void Myinit(void )
     {
         PID_Set_KP_KI_KD(&Torque[i],0.64f,0,0.0f);
     }
+    osDelay(4000); //等待云深处电机驱动开机
+//    remoter.rc.ch[0] = 1000;
+//    remoter.rc.ch[1] = 1000;
+//    remoter.rc.ch[2] = 1000;
+
 
 }

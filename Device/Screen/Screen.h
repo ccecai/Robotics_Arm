@@ -17,6 +17,7 @@ extern uint8_t Pro_flag;
 #define IF_MODE 1
 #define Demonstration_MODE 2
 #define Gravity_compensation_MODE 3
+#define NO_MODE 4
 
 void Screen_DataProcess(void);
 

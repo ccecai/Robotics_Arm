@@ -9,7 +9,18 @@ uint8_t Pro_flag = 0;
 
 void Screen_DataProcess(void)
 {
-    if(Screen_Data[0] == 0xa0 && Screen_Data[1] == 0x11 && Screen_Data[2] == 0xaf)
+    if(Screen_Data[0] == 0xa0 && Screen_Data[1] == 0x10 && Screen_Data[2] == 0xaf)
+    {
+        Pro_flag = 0;
+        output_mode = Demonstration_MODE;
+        TargetAngle[1] = 0;
+        TargetAngle[2] = 0;
+        TargetAngle[3] = 0;
+        theta1 = 0;
+        theta2 = 0;
+        theta3 = 0;
+    }
+    else if(Screen_Data[0] == 0xa0 && Screen_Data[1] == 0x11 && Screen_Data[2] == 0xaf)
     {
         Pro_flag = 1;
     }
@@ -24,7 +35,7 @@ void Screen_DataProcess(void)
     }
     else if(Screen_Data[0] == 0xa0 && Screen_Data[1] == 0x14 && Screen_Data[2] == 0xaf && Pro_flag == 1)
     {
-        output_mode = Gravity_compensation_MODE;
+        output_mode = NO_MODE;
         Demonstration();
     }
     else if(Screen_Data[0] == 0xa0 && Screen_Data[1] == 0x15 && Screen_Data[2] == 0xaf && Pro_flag == 1)

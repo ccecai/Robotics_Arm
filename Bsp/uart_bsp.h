@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "controller.h"
+#include "Screen.h"
 
 #define BUFF_SIZE	25
 
@@ -48,6 +49,7 @@ typedef struct
 } remoter_t;
 
 extern float prx,pry,prz;
+extern remoter_t remoter;
 
 void RC_process(void);
 

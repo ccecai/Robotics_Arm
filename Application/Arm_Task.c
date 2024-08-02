@@ -7,5 +7,5 @@ void Arm_Task(void )
 {
     Screen_DataProcess();
 
-    osDelay(5);
+    osDelay(2);
 }

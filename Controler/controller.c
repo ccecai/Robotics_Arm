@@ -201,9 +201,32 @@ void IF_kinematics(double x,double y,double z)
     }
     else
     {
-        theta1 = -atan(y/x);
-        theta2 = -(PI / 2  - atan(z / sqrt(pow(x,2) + pow(y,2))) - acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)));
-        theta3 = acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)) + atan(sqrt(pow(x,2) + pow(y,2)) / z);
+        if(x >= 0 && y >= 0)
+        {
+            theta1 = -atan(y / x);
+            theta2 = -(PI / 2  - atan(z / sqrt(pow(x,2) + pow(y,2))) - acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)));
+            theta3 = acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)) + atan(sqrt(pow(x,2) + pow(y,2)) / z);
+        }
+        else if(x >= 0 && y < 0)
+        {
+            theta1 = atan((-y) / x);
+//            theta1 = -(PI / 2 + atan((-x) / y));
+            theta2 = -(PI / 2  - atan(z / sqrt(pow(x,2) + pow(y,2))) - acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)));
+            theta3 = acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)) + atan(sqrt(pow(x,2) + pow(y,2)) / z);
+        }
+        else if(x < 0 && y >= 0)
+        {
+            theta1 = -(PI / 2 + atan((-x) / y));
+            theta2 = -(PI / 2  - atan(z / sqrt(pow(x,2) + pow(y,2))) - acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)));
+            theta3 = acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)) + atan(sqrt(pow(x,2) + pow(y,2)) / z);
+        }
+        else if(x < 0 && y < 0)
+        {
+            theta1 = PI / 2 + atan((-x) / (-y));
+            theta2 = -(PI / 2  - atan(z / sqrt(pow(x,2) + pow(y,2))) - acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)));
+            theta3 = acos(sqrt(pow(x,2) + pow(y,2) + pow(z,2)) / (2*L1)) + atan(sqrt(pow(x,2) + pow(y,2)) / z);
+        }
+
     }
 }
 

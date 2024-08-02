@@ -7,5 +7,5 @@ void RC_Task(void )
 {
     RC_process();
 
-    osDelay(1);
+    osDelay(25);
 }
